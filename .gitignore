@@ -4,9 +4,9 @@ web/node_modules/
 server/node_modules/
 
 # Environment files (API keys, secrets)
-.env
-web/.env
-server/.env
+# .env
+# web/.env
+# server/.env
 
 # Build outputs and cache
 dist/
