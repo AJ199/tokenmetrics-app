@@ -1,0 +1,30 @@
+# Dependency directories
+node_modules/
+web/node_modules/
+server/node_modules/
+
+# Environment files (API keys, secrets)
+.env
+web/.env
+server/.env
+
+# Build outputs and cache
+dist/
+build/
+.vite/
+coverage/
+*.log
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# IDE-specific settings
+.vscode/
+.idea/
+
+# Temporary data or local storage
+*.tmp
+*.cache
+*.bak
+*.swp

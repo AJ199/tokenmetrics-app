@@ -1,0 +1,28 @@
+{
+  "name": "tokenmetrics-app",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm:dev:web\" \"npm:dev:server\"",
+    "dev:web": "cd web && vite",
+    "dev:server": "cd server && nodemon index.js",
+    "build": "cd web && vite build",
+    "start": "cd server && node index.js"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "^18.3.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.0",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2",
+    "vite": "^5.4.0"
+  }
+}
