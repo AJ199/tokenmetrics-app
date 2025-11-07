@@ -82,6 +82,13 @@ Frontend successfully shows indices (^GSPC, ^IXIC, BTCUSD, ETHUSD) and interacti
 
 ---
 
+## Live Demo
+
+- Frontend: https://tokenmetrics-app.vercel.app
+- Backend: https://tokenmetrics-app.onrender.com/api/indices
+
+---
+
 ## Project Structure
 
 ```
