@@ -1,7 +1,7 @@
 // web/src/api.js
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://tokenmetrics-app.onrender.com/api";
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE || "http://localhost:8080/api";
+console.log("🔍 API Base URL (runtime):", API_BASE);
 
 export async function getIndices(symbols) {
   const qs = symbols ? `?symbols=${symbols.join(",")}` : "";
