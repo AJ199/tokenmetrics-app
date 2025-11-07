@@ -13,29 +13,29 @@ const { TTLCache } = require("./cache");
 const app = express();
 
 // -------------------------------------------
-// CORS Setup (Render + Vercel + Local)
+// CORS (Vercel + Local Dev)
 // -------------------------------------------
 const allowedOrigins = [
-  "https://tokenmetrics-app.vercel.app", // Frontend (Vercel)
-  "http://localhost:5173"                // Local Dev
+  "https://tokenmetrics-app.vercel.app",
+  "http://localhost:5173"
 ];
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow no origin (like server-to-server) or whitelisted ones
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn("Blocked CORS from:", origin);
+        callback(new Error("CORS not allowed for this origin"));
+      }
+    },
+    credentials: true,
+  })
+);
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
-app.use(cors());
+app.options("*", cors()); // Preflight support
 app.use(express.json());
 
 // -------------------------------------------
@@ -56,7 +56,10 @@ const cache = new TTLCache(CACHE_TTL);
 // Routes
 // -------------------------------------------
 
-// Fetch market indices
+// Quick health check route
+app.get("/api/ping", (req, res) => res.json({ status: "ok" }));
+
+// Market indices
 app.get("/api/indices", async (req, res) => {
   try {
     const cacheKey = "indices";
@@ -69,8 +72,8 @@ app.get("/api/indices", async (req, res) => {
     const monthCheck = checkPerMonthOrBump();
     if (!monthCheck.ok)
       return res.status(429).json({ error: "Monthly API limit exceeded" });
-
-    // Fetch from vendor API
+    
+// Fetch from vendor API
     const data = await fetchIndices(SYMBOLS);
     cache.set(cacheKey, data);
     res.json({ source: "live", data });
@@ -80,7 +83,7 @@ app.get("/api/indices", async (req, res) => {
   }
 });
 
-// Fetch 30-day historical data
+// 30-day history
 app.get("/api/history/:symbol", async (req, res) => {
   try {
     const { symbol } = req.params;
@@ -105,7 +108,7 @@ app.get("/api/history/:symbol", async (req, res) => {
 });
 
 // -------------------------------------------
-// Serve frontend build for production
+// Serve Frontend
 // -------------------------------------------
 if (process.env.NODE_ENV === "production") {
   const webPath = path.join(__dirname, "../web/dist");
@@ -117,5 +120,5 @@ if (process.env.NODE_ENV === "production") {
 // Start Server
 // -------------------------------------------
 app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
+  console.log(`✅ Server running on http://localhost:${PORT}`)
 );
