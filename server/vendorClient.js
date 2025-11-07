@@ -10,12 +10,12 @@ async function safeFetch(url, label) {
     if (!res.ok) throw new Error(`${label} failed with status ${res.status}`);
     return await res.json();
   } catch (err) {
-    console.error(`❌ [${label}] Fetch error:`, err.message);
+    console.error(`[${label}] Fetch error:`, err.message);
     return null; // fallback handled later
   }
 }
 
-// 🔹 Fetch multiple indices (S&P 500, NASDAQ, BTC, ETH)
+// Fetch multiple indices (S&P 500, NASDAQ, BTC, ETH)
 async function fetchIndices(symbols = ["^GSPC", "^IXIC", "BTCUSD", "ETHUSD"]) {
   const joined = symbols.map(encodeURIComponent).join(",");
   const url = `${BASE}/quote/${joined}?apikey=${KEY}`;
@@ -25,7 +25,7 @@ async function fetchIndices(symbols = ["^GSPC", "^IXIC", "BTCUSD", "ETHUSD"]) {
   if (data && Array.isArray(data)) return data;
 
   // fallback mock data
-  console.warn("⚠️ Returning fallback indices data");
+  console.warn("Returning fallback indices data");
   return [
     { symbol: "^GSPC", name: "S&P 500", price: 5230.54, changesPercentage: 0.45 },
     { symbol: "^IXIC", name: "NASDAQ", price: 16840.21, changesPercentage: -0.21 },
@@ -34,7 +34,7 @@ async function fetchIndices(symbols = ["^GSPC", "^IXIC", "BTCUSD", "ETHUSD"]) {
   ];
 }
 
-// 🔹 Fetch 30-day historical data
+// Fetch 30-day historical data
 async function fetchHistory30d(symbol) {
   const url = `${BASE}/historical-price-full/${encodeURIComponent(symbol)}?timeseries=30&apikey=${KEY}`;
   console.log(`[fetchHistory30d] Requesting: ${url}`);
@@ -43,7 +43,7 @@ async function fetchHistory30d(symbol) {
   if (data && data.historical) return data;
 
   // fallback mock data
-  console.warn(`⚠️ Returning fallback history data for ${symbol}`);
+  console.warn(`Returning fallback history data for ${symbol}`);
   const now = Date.now();
   const fake = Array.from({ length: 30 }).map((_, i) => ({
     date: new Date(now - i * 86400000).toISOString().split("T")[0],

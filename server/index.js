@@ -1,5 +1,5 @@
 // -------------------------------------------
-// ✅ Load environment variables
+// Load environment variables
 // -------------------------------------------
 const path = require("path"); // Must be imported before using
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
@@ -11,7 +11,29 @@ const { checkPerMinute, checkPerMonthOrBump } = require("./limits");
 const { TTLCache } = require("./cache");
 
 const app = express();
-app.use(cors());
+
+// -------------------------------------------
+// CORS for frontend (Vercel)
+// -------------------------------------------
+const allowedOrigins = [
+  "https://tokenmetrics-app.vercel.app", // your frontend
+  "http://localhost:5173"                // local dev (Vite)
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed for this origin"));
+      }
+    },
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 // -------------------------------------------
@@ -32,7 +54,7 @@ const cache = new TTLCache(CACHE_TTL);
 // Routes
 // -------------------------------------------
 
-// ✅ Fetch market indices
+// Fetch market indices
 app.get("/api/indices", async (req, res) => {
   try {
     const cacheKey = "indices";
@@ -51,12 +73,12 @@ app.get("/api/indices", async (req, res) => {
     cache.set(cacheKey, data);
     res.json({ source: "live", data });
   } catch (err) {
-    console.error("❌ Error in /api/indices:", err);
+    console.error("Error in /api/indices:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✅ Fetch 30-day historical data
+// Fetch 30-day historical data
 app.get("/api/history/:symbol", async (req, res) => {
   try {
     const { symbol } = req.params;
@@ -75,12 +97,12 @@ app.get("/api/history/:symbol", async (req, res) => {
     cache.set(cacheKey, data);
     res.json({ source: "live", data });
   } catch (err) {
-    console.error("❌ Error in /api/history:", err);
+    console.error("Error in /api/history:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✅ Serve frontend build (for production)
+// Serve frontend build for production
 if (process.env.NODE_ENV === "production") {
   const webPath = path.join(__dirname, "../web/dist");
   app.use(express.static(webPath));

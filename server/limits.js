@@ -28,12 +28,12 @@ class TokenBucket {
 
 const bucket = new TokenBucket(20); // 20 requests per minute limit
 
-// ✅ Check per-minute limit
+// Check per-minute limit
 function checkPerMinute() {
   return bucket.take(1);
 }
 
-// ✅ Check monthly limit and increment
+// Check monthly limit and increment
 function checkPerMonthOrBump() {
   const cap = 500; // monthly cap
   const data = readMonthlyCounter();

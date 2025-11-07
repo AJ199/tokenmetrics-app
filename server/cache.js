@@ -11,7 +11,7 @@ class TTLCache {
     this.map = new Map();
   }
 
-  // ✅ Get value if still valid
+  // Get value if still valid
   get(key) {
     const entry = this.map.get(key);
     if (!entry) return null;
@@ -22,14 +22,14 @@ class TTLCache {
     return entry.value;
   }
 
-  // ✅ Set value with expiration
+  // Set value with expiration
   set(key, value, ttlMs = this.ttl) {
     this.map.set(key, { value, expires: Date.now() + ttlMs });
   }
 }
 
 // ------------------------------
-// Monthly API Counter (Persistent)
+// Monthly API Counter
 // ------------------------------
 const monthlyFile = path.join(__dirname, "monthlyCounter.json");
 
