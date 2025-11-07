@@ -1,7 +1,7 @@
 // -------------------------------------------
 // Load environment variables
 // -------------------------------------------
-const path = require("path"); // Must be imported before using
+const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const express = require("express");
@@ -13,27 +13,29 @@ const { TTLCache } = require("./cache");
 const app = express();
 
 // -------------------------------------------
-// CORS for frontend (Vercel)
+// CORS Setup (Render + Vercel + Local)
 // -------------------------------------------
 const allowedOrigins = [
-  "https://tokenmetrics-app.vercel.app", // your frontend
-  "http://localhost:5173"                // local dev (Vite)
+  "https://tokenmetrics-app.vercel.app", // Frontend (Vercel)
+  "http://localhost:5173"                // Local Dev
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS not allowed for this origin"));
-      }
-    },
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
 
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+app.use(cors());
 app.use(express.json());
 
 // -------------------------------------------
@@ -102,7 +104,9 @@ app.get("/api/history/:symbol", async (req, res) => {
   }
 });
 
+// -------------------------------------------
 // Serve frontend build for production
+// -------------------------------------------
 if (process.env.NODE_ENV === "production") {
   const webPath = path.join(__dirname, "../web/dist");
   app.use(express.static(webPath));
@@ -113,5 +117,5 @@ if (process.env.NODE_ENV === "production") {
 // Start Server
 // -------------------------------------------
 app.listen(PORT, () =>
-  console.log(`✅ Server running on http://localhost:${PORT}`)
+  console.log(`Server running on http://localhost:${PORT}`)
 );
